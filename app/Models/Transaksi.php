@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\DB;
 class Transaksi extends Model
 {
     const STATUS = [
-        'diproses'     => 'Diproses',
-        'disiapkan'    => 'Disiapkan',
+        'diproses' => 'Diproses',
+        'disiapkan' => 'Disiapkan',
         'siap_diambil' => 'Siap Diambil',
-        'selesai'      => 'Selesai',
-        'dibatalkan'   => 'Dibatalkan',
+        'selesai' => 'Selesai',
+        'dibatalkan' => 'Dibatalkan',
     ];
 
     protected $table = 'transaksi';
@@ -26,8 +26,11 @@ class Transaksi extends Model
     protected $fillable = [
         'id_user',
         'id_keranjang',
+        'sumber',
+        'nomor_wa',
         'total_harga',
         'status',
+        'catatan',
     ];
 
     public function detail()

@@ -21,6 +21,11 @@
 
 <form method="GET" class="ad-card ad-bar">
   <input class="ad-in" name="q" value="{{ request('q') }}" placeholder="Cari nomor pesanan atau pelanggan...">
+  <select class="ad-in ad-in-sm" name="sumber" onchange="this.form.submit()">
+    <option value="">Semua Saluran</option>
+    <option value="website" @selected(request('sumber')=='website')>Website</option>
+    <option value="whatsapp" @selected(request('sumber')=='whatsapp')>WhatsApp</option>
+  </select>
   <select class="ad-in ad-in-sm" name="status" onchange="this.form.submit()">
     <option value="">Semua Status Aktif</option>
     @foreach(\App\Models\Transaksi::STATUS as $k=>$l)<option value="{{ $k }}" @selected($st==$k)>{{ $l }}</option>@endforeach
@@ -41,18 +46,25 @@
       </div>
       <div class="ad-tbl-w">
         <table class="ad-tbl">
-          <thead><tr><th>Pesanan</th><th>Pelanggan</th><th>Status</th><th>Total</th></tr></thead>
+          <thead><tr><th>Pesanan</th><th>Saluran</th><th>Pelanggan</th><th>Status</th><th>Total</th></tr></thead>
           <tbody>
           @forelse($list as $t)
             <tr class="ps-row {{ $sel && $sel->id_transaksi==$t->id_transaksi ? 'sel' : '' }}"
                 onclick="location.href='{{ route('admin.pesanan.index',array_merge(request()->except('id'),['id'=>$t->id_transaksi])) }}'">
               <td><b>#{{ $t->kode }}</b><div class="ad-mut">{{ $tgl($t) }}</div></td>
-              <td><b>{{ optional($t->user)->nama_user ?? '-' }}</b><div class="ad-mut">{{ optional($t->user)->email }}</div></td>
+              <td>
+                @if(($t->sumber ?? 'website') === 'whatsapp')
+                  <span class="ad-badge" style="background:#dcfce7;color:#15803d;font-weight:600;">WhatsApp</span>
+                @else
+                  <span class="ad-badge" style="background:#f3f4f6;color:#4b5563;">Website</span>
+                @endif
+              </td>
+              <td><b>{{ optional($t->user)->nama_user ?? '-' }}</b><div class="ad-mut">{{ $t->nomor_wa ?: optional($t->user)->no_telepon ?: optional($t->user)->email }}</div></td>
               <td><span class="tx-b {{ $t->status }}">{{ \App\Models\Transaksi::STATUS[$t->status] }}</span><div class="ad-mut">{{ $t->detail->count() }} item</div></td>
               <td><b>{{ $rp($t->total_harga) }}</b></td>
             </tr>
           @empty
-            <tr><td colspan="4" class="ad-empty">Tidak ada pesanan.</td></tr>
+            <tr><td colspan="5" class="ad-empty">Tidak ada pesanan.</td></tr>
           @endforelse
           </tbody>
         </table>
@@ -92,6 +104,10 @@
       </div>
       <dl class="ps-dl">
         <div><dt>Pelanggan</dt><dd>{{ optional($sel->user)->nama_user ?? '-' }}</dd></div>
+        <div><dt>Saluran</dt><dd><span class="ad-badge" style="{{ ($sel->sumber ?? 'website') === 'whatsapp' ? 'background:#dcfce7;color:#15803d;font-weight:600;' : 'background:#f3f4f6;color:#4b5563;' }}">{{ strtoupper($sel->sumber ?? 'WEBSITE') }}</span></dd></div>
+        @if($sel->nomor_wa || optional($sel->user)->no_telepon)
+          <div><dt>No. WA / HP</dt><dd><a href="https://wa.me/{{ preg_replace('/[^0-9]/','',$sel->nomor_wa ?: $sel->user->no_telepon) }}" target="_blank" style="color:#15803d;font-weight:600;text-decoration:none;">{{ $sel->nomor_wa ?: $sel->user->no_telepon }} ↗</a></dd></div>
+        @endif
         <div><dt>Metode Pembayaran</dt><dd>COD (Bayar di Toko)</dd></div>
         <div><dt>Status Pembayaran</dt><dd>{{ optional($sel->pembayaran)->status_pembayaran ?? '-' }}</dd></div>
         <div><dt>Total Tagihan</dt><dd class="or">{{ $rp($sel->total_harga) }}</dd></div>
@@ -101,7 +117,7 @@
       @foreach($sel->detail as $d)
         <div class="ps-item">
           <div class="ps-img">@if(optional($d->produk)->gambar_url)<img src="{{ $d->produk->gambar_url }}" alt="">@else @include('icon',['n'=>'image']) @endif</div>
-          <div><b>{{ optional($d->produk)->nama_produk ?? 'Produk dihapus' }}</b><div class="ad-mut">Qty {{ $d->jumlah }} • {{ $rp($d->harga_satuan) }} / pcs</div></div>
+          <div><b>{{ $d->nama_produk_snapshot ?: optional($d->produk)->nama_produk ?: 'Produk dihapus' }}</b><div class="ad-mut">Qty {{ $d->jumlah }} • {{ $rp($d->harga_satuan) }} / {{ optional($d->produk)->satuan ?? 'pcs' }}</div></div>
           <b>{{ $rp($d->subtotal) }}</b>
         </div>
       @endforeach

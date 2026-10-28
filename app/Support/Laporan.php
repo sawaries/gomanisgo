@@ -2,8 +2,8 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\DB;
 use App\Models\Transaksi;
+use Illuminate\Support\Facades\DB;
 
 class Laporan
 {
@@ -23,8 +23,13 @@ class Laporan
     // Rp18 juta / Rp350 rb / Rp500
     public static function singkat($n)
     {
-        if ($n >= 1000000) return 'Rp'.self::angka($n / 1000000).' juta';
-        if ($n >= 1000) return 'Rp'.self::angka($n / 1000).' rb';
+        if ($n >= 1000000) {
+            return 'Rp'.self::angka($n / 1000000).' juta';
+        }
+        if ($n >= 1000) {
+            return 'Rp'.self::angka($n / 1000).' rb';
+        }
+
         return 'Rp'.number_format($n, 0, ',', '.');
     }
 
@@ -56,6 +61,7 @@ class Laporan
             ->get([$nama.' as nama', DB::raw('SUM(d.jumlah) as total')]);
 
         $sama = $awal->year == now()->year;
+
         return [
             'periode' => ($sama ? self::BULAN[$awal->month] : self::BULAN[$awal->month].' '.$awal->year).' – '.self::BULAN[now()->month].' '.now()->year,
             'bulan' => $bulan,

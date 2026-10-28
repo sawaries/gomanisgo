@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Produk extends Model
 {
     protected $table = 'produk';
+
     protected $primaryKey = 'id_produk';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -19,7 +21,7 @@ class Produk extends Model
         'stok',
         'deskripsi',
         'gambar',
-        'status'
+        'status',
     ];
 
     protected $casts = ['status' => 'boolean'];

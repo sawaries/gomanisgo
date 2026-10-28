@@ -36,7 +36,7 @@ return new class extends Migration
         Schema::create('keranjang', function (Blueprint $table) {
             $table->increments('id_keranjang');
             $table->unsignedBigInteger('id_user');
-            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
         });
 
         // Tabel detail_keranjang
@@ -59,7 +59,7 @@ return new class extends Migration
             $table->string('status', 30)->default('diproses');
             $table->timestamp('tanggal_transaksi')->nullable()->useCurrent();
 
-            $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
             $table->foreign('id_keranjang')->references('id_keranjang')->on('keranjang')->onDelete('set null');
         });
 

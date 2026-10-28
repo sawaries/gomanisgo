@@ -15,7 +15,9 @@ class Xlsx
 
     public static function make(array $rows, string $sheet = 'Sheet1', array $widths = [], bool $boldLast = false): ?string
     {
-        if (!class_exists(\ZipArchive::class)) return null;
+        if (! class_exists(\ZipArchive::class)) {
+            return null;
+        }
 
         $last = count($rows) - 1;
         $data = '';
@@ -42,8 +44,10 @@ class Xlsx
         $nama = self::esc(substr(preg_replace('/[\\\\\/?*\[\]:]/', '-', $sheet), 0, 31));
 
         $path = tempnam(sys_get_temp_dir(), 'xl');
-        $zip = new \ZipArchive();
-        if ($zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) return null;
+        $zip = new \ZipArchive;
+        if ($zip->open($path, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return null;
+        }
         $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>');
         $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
         $zip->addFromString('xl/workbook.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="'.$nama.'" sheetId="1" r:id="rId1"/></sheets></workbook>');
