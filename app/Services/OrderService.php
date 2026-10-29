@@ -15,11 +15,24 @@ use Illuminate\Support\Str;
 
 class OrderService
 {
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     /**
-     * Cari user berdasarkan nomor telepon, atau buat akun baru otomatis jika belum terdaftar.
+     * Cari user berdasarkan nomor telepon atau ID, atau buat akun baru otomatis jika belum terdaftar.
      */
     public function findOrCreateUserByPhone(string $phone, ?string $name = null): User
     {
+        // Jika format ID user website (contoh: user_12)
+        if (str_starts_with($phone, 'user_')) {
+            $userId = (int) substr($phone, 5);
+            $user = User::find($userId);
+            if ($user) {
+                return $user;
+            }
+        }
+
         // Normalisasi nomor telepon
         $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
 
@@ -207,7 +220,7 @@ class OrderService
      *
      * @return array{success: bool, transaksi: ?Transaksi, pesan: string}
      */
-    public function confirmAndCreateOrder(OrderDraft $draft): array
+    public function confirmAndCreateOrder(OrderDraft $draft, string $sumber = 'whatsapp'): array
     {
         if (! $draft->isValid()) {
             return [
@@ -218,7 +231,7 @@ class OrderService
         }
 
         try {
-            return DB::transaction(function () use ($draft) {
+            return DB::transaction(function () use ($draft, $sumber) {
                 // 1. Lock dan periksa ulang stok setiap produk
                 $items = $draft->items;
                 $finalTotal = 0;
@@ -241,14 +254,16 @@ class OrderService
                 $user = $this->findOrCreateUserByPhone($draft->sender_phone, $draft->sender_name);
 
                 // 3. Buat Transaksi
+                $nomorWa = str_starts_with($draft->sender_phone, 'user_') ? ($user->no_telepon ?: '-') : $draft->sender_phone;
+
                 $transaksi = Transaksi::create([
                     'id_user' => $user->id_user,
                     'id_keranjang' => null,
-                    'sumber' => 'whatsapp',
-                    'nomor_wa' => $draft->sender_phone,
+                    'sumber' => $sumber,
+                    'nomor_wa' => $nomorWa,
                     'total_harga' => $finalTotal,
                     'status' => 'diproses',
-                    'catatan' => 'Pesanan otomatis via WhatsApp Bot',
+                    'catatan' => 'Pesanan otomatis via '.($sumber === 'website' ? 'AI Chatbot Website' : 'WhatsApp Bot'),
                 ]);
 
                 // 4. Buat Detail Transaksi dan kurangi stok produk secara atomik
@@ -292,5 +307,90 @@ class OrderService
                 'pesan' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Deteksi niat pemesanan dari kalimat teks pelanggan (Web Chatbot maupun WhatsApp).
+     * Mendukung:
+     * - "pesan telur ayam negeri segar 1kg"
+     * - "beli minyak goreng sania 2 pouch dan beras pandan 1 karung"
+     * - "mau beli 2 minyak bimoli"
+     *
+     * @return array{is_order: bool, items: array<int, array{id_produk: int, jumlah: int}>}
+     */
+    public function detectOrderIntent(string $text): array
+    {
+        $lower = strtolower(trim($text));
+        $orderKeywords = ['beli', 'pesan', 'order', 'mau ambil', 'ambil', 'mau beli'];
+
+        $isOrder = false;
+        foreach ($orderKeywords as $kw) {
+            if (str_contains($lower, $kw)) {
+                $isOrder = true;
+                break;
+            }
+        }
+
+        if (! $isOrder) {
+            return ['is_order' => false, 'items' => []];
+        }
+
+        // Pisahkan segmen kalimat jika ada pemesanan multi-produk (pemisah: newline, koma, kata "dan", "plus")
+        $segments = preg_split('/(\r\n|\n|\r|,|\bdan\b|\bplus\b)/i', $text);
+        $items = [];
+        $seenProductIds = [];
+
+        foreach ($segments as $segment) {
+            $seg = trim($segment);
+            if (empty($seg)) {
+                continue;
+            }
+
+            // Ekstrak angka jumlah (contoh: "1kg", "2 pouch", "3", "1 kg")
+            preg_match('/(\d+)\s*(kg|liter|karung|pouch|pcs|botol|bungkus|dus|kaleng)?/i', $seg, $matches);
+            $jumlah = isset($matches[1]) ? max(1, (int) $matches[1]) : 1;
+
+            // Bersihkan kata-kata pembantu untuk menyisakan nama produk
+            $cleanQuery = preg_replace('/(beli|pesan|order|mau|saya|tolong|sebanyak|\d+\s*(kg|liter|karung|pouch|pcs|botol|bungkus|dus|kaleng)?)/iu', ' ', $seg);
+            $cleanQuery = trim(preg_replace('/\s+/', ' ', $cleanQuery));
+
+            if (empty($cleanQuery) || mb_strlen($cleanQuery) < 3) {
+                continue;
+            }
+
+            $produk = $this->productService->cariProduk($cleanQuery, limit: 1)->first();
+
+            if ($produk && ! in_array($produk->id_produk, $seenProductIds, true)) {
+                $seenProductIds[] = $produk->id_produk;
+                $items[] = [
+                    'id_produk' => $produk->id_produk,
+                    'jumlah' => $jumlah,
+                ];
+            }
+        }
+
+        // Fallback seluruh kalimat jika segmen tidak mendeteksi
+        if (empty($items)) {
+            preg_match('/(\d+)\s*(kg|liter|karung|pouch|pcs|botol|bungkus|dus|kaleng)?/i', $text, $matches);
+            $jumlah = isset($matches[1]) ? max(1, (int) $matches[1]) : 1;
+
+            $cleanQuery = preg_replace('/(beli|pesan|order|mau|saya|tolong|sebanyak|\d+\s*(kg|liter|karung|pouch|pcs|botol|bungkus|dus|kaleng)?)/iu', ' ', $text);
+            $cleanQuery = trim(preg_replace('/\s+/', ' ', $cleanQuery));
+
+            if (! empty($cleanQuery) && mb_strlen($cleanQuery) >= 3) {
+                $produk = $this->productService->cariProduk($cleanQuery, limit: 1)->first();
+                if ($produk) {
+                    $items[] = [
+                        'id_produk' => $produk->id_produk,
+                        'jumlah' => $jumlah,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'is_order' => ! empty($items),
+            'items' => $items,
+        ];
     }
 }

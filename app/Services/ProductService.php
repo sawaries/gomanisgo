@@ -8,20 +8,73 @@ use Illuminate\Database\Eloquent\Collection;
 class ProductService
 {
     /**
+     * Bersihkan teks dari kata-kata umum percakapan untuk mengambil kata kunci produk sembako murni.
+     *
+     * @return array<int, string>
+     */
+    public function ekstrakKataKunci(string $text): array
+    {
+        $clean = strtolower(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $text));
+        $words = array_filter(explode(' ', $clean));
+
+        $stopwords = [
+            'pesan', 'beli', 'order', 'mau', 'ambil', 'minta', 'tolong', 'bisa', 'saya', 'anda',
+            'kami', 'dong', 'kak', 'min', 'gan', 'sis', 'ada', 'apakah', 'merk', 'merek', 'yang',
+            'tersedia', 'harga', 'berapa', 'apa', 'saja', 'di', 'ke', 'dari', 'ini', 'itu',
+            'dan', 'atau', 'buat', 'untuk', 'stok', 'promo', 'diskon', 'gak', 'nggak', 'ga',
+            'halo', 'hai', 'hello', 'selamat', 'pagi', 'siang', 'sore', 'malam', 'assalamualaikum',
+            'kg', 'liter', 'karung', 'pcs', 'pouch', 'bungkus', 'botol', 'dus', 'kaleng',
+            '1kg', '2kg', '5kg', '10kg', '1l', '2l', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+        ];
+
+        return array_values(array_filter($words, function ($w) use ($stopwords) {
+            return mb_strlen($w) >= 2 && ! in_array($w, $stopwords, true);
+        }));
+    }
+
+    /**
      * Cari produk aktif berdasarkan kata kunci dan/atau kategori.
+     * Menggunakan strategi AND terlebih dahulu untuk mencegah hasil yang tidak relevan.
      */
     public function cariProduk(?string $keyword = null, ?int $idKategori = null, int $limit = 20): Collection
     {
+        $keywords = $keyword ? $this->ekstrakKataKunci($keyword) : [];
+
+        // 1. Prioritaskan pencarian presisi: cocok dengan SEMUA kata kunci produk (AND)
+        if (! empty($keywords)) {
+            $queryAnd = Produk::with('kategori')
+                ->where('status', true)
+                ->when($idKategori, fn ($q) => $q->where('id_kategori', $idKategori))
+                ->where(function ($sub) use ($keywords) {
+                    foreach ($keywords as $term) {
+                        $sub->where(function ($w) use ($term) {
+                            $w->where('nama_produk', 'like', '%'.$term.'%')
+                                ->orWhere('deskripsi', 'like', '%'.$term.'%');
+                        });
+                    }
+                })
+                ->orderBy('nama_produk')
+                ->limit($limit);
+
+            $hasilAnd = $queryAnd->get();
+            if ($hasilAnd->isNotEmpty()) {
+                return $hasilAnd;
+            }
+        }
+
+        // 2. Jika tidak ada yang cocok dengan semua kata kunci, gunakan pencarian fleksibel
         return Produk::with('kategori')
             ->where('status', true)
-            ->when($keyword, function ($query) use ($keyword) {
-                $terms = array_filter(explode(' ', trim($keyword)));
-                $query->where(function ($sub) use ($terms, $keyword) {
-                    $sub->where('nama_produk', 'like', '%'.$keyword.'%')
-                        ->orWhere('deskripsi', 'like', '%'.$keyword.'%');
+            ->when(! empty($keywords) || $keyword, function ($query) use ($keywords, $keyword) {
+                $query->where(function ($sub) use ($keywords, $keyword) {
+                    if (! empty($keyword)) {
+                        $sub->where('nama_produk', 'like', '%'.trim($keyword).'%')
+                            ->orWhere('deskripsi', 'like', '%'.trim($keyword).'%');
+                    }
 
-                    foreach ($terms as $term) {
-                        $sub->orWhere('nama_produk', 'like', '%'.$term.'%');
+                    foreach ($keywords as $term) {
+                        $sub->orWhere('nama_produk', 'like', '%'.$term.'%')
+                            ->orWhere('deskripsi', 'like', '%'.$term.'%');
                     }
                 });
             })
@@ -61,8 +114,12 @@ class ProductService
     {
         $katalog = $filterQuery ? $this->cariProduk($filterQuery, limit: 15) : $this->cariProduk(limit: 50);
 
+        if ($katalog->isEmpty() && $filterQuery) {
+            $katalog = $this->cariProduk(limit: 30);
+        }
+
         if ($katalog->isEmpty()) {
-            return 'Tidak ada produk yang cocok dengan pencarian.';
+            return 'Belum ada produk aktif yang terdaftar di database toko.';
         }
 
         $baris = [];

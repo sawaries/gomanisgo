@@ -140,4 +140,46 @@ class ChatbotTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['message']);
     }
+
+    public function test_user_bisa_membuat_draft_dan_konfirmasi_pesanan_lewat_chatbot_web(): void
+    {
+        $user = User::create([
+            'nama_user' => 'Rina Wijaya',
+            'email' => 'rina@example.com',
+            'no_telepon' => '087788990011',
+            'password' => bcrypt('password123'),
+        ]);
+
+        // 1. Kirim pesan pemesanan
+        $responseOrder = $this->actingAs($user, 'web')->postJson(route('chatbot.message'), [
+            'message' => 'pesan beras pandan wangi 2 karung',
+        ]);
+
+        $responseOrder->assertStatus(200);
+        $responseOrder->assertSee('ringkasan pesanan');
+        $responseOrder->assertSee('Beras Pandan Wangi 5kg');
+        $responseOrder->assertSee('KONFIRMASI');
+
+        // 2. Konfirmasi pesanan
+        $responseConfirm = $this->actingAs($user, 'web')->postJson(route('chatbot.message'), [
+            'message' => 'KONFIRMASI',
+        ]);
+
+        $responseConfirm->assertStatus(200);
+        $responseConfirm->assertSee('Pesanan Anda berhasil dibuat');
+
+        // 3. Verifikasi data transaksi tercatat di database
+        $this->assertDatabaseHas('transaksi', [
+            'id_user' => $user->id_user,
+            'sumber' => 'website',
+            'status' => 'diproses',
+            'total_harga' => 150000,
+        ]);
+
+        // Stok berkurang dari 20 menjadi 18
+        $this->assertDatabaseHas('produk', [
+            'nama_produk' => 'Beras Pandan Wangi 5kg',
+            'stok' => 18,
+        ]);
+    }
 }

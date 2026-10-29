@@ -235,56 +235,11 @@ class WhatsAppService
 
     /**
      * Deteksi niat pemesanan dari kalimat teks pelanggan.
-     * Mendukung pola seperti:
-     * - "beli beras pandan 2"
-     * - "pesan minyak 1"
-     * - "mau beli beras 1 karung"
      *
-     * @return array{is_order: bool, items: array}
+     * @return array{is_order: bool, items: array<int, array{id_produk: int, jumlah: int}>}
      */
     public function detectOrderIntent(string $text): array
     {
-        $lower = strtolower($text);
-        $orderKeywords = ['beli', 'pesan', 'order', 'mau ambil', 'ambil'];
-
-        $isOrder = false;
-        foreach ($orderKeywords as $kw) {
-            if (str_contains($lower, $kw)) {
-                $isOrder = true;
-                break;
-            }
-        }
-
-        if (! $isOrder) {
-            return ['is_order' => false, 'items' => []];
-        }
-
-        // Ekstrak angka jumlah dari kalimat (default 1 jika tidak ada)
-        preg_match('/(\d+)/', $text, $matches);
-        $jumlah = isset($matches[1]) ? max(1, (int) $matches[1]) : 1;
-
-        // Bersihkan keyword pembelian untuk mencari produk yang cocok di DB
-        $cleanQuery = preg_replace('/(beli|pesan|order|mau|saya|tolong|sebanyak|\d+|karung|liter|kg|pcs|pouch|bungkus)/i', '', $text);
-        $cleanQuery = trim($cleanQuery);
-
-        if (empty($cleanQuery)) {
-            return ['is_order' => false, 'items' => []];
-        }
-
-        $produk = $this->productService->cariProduk($cleanQuery, limit: 1)->first();
-
-        if ($produk) {
-            return [
-                'is_order' => true,
-                'items' => [
-                    [
-                        'id_produk' => $produk->id_produk,
-                        'jumlah' => $jumlah,
-                    ],
-                ],
-            ];
-        }
-
-        return ['is_order' => false, 'items' => []];
+        return $this->orderService->detectOrderIntent($text);
     }
 }

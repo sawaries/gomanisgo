@@ -57,8 +57,8 @@ class GeminiService
             ];
         }
 
-        // Ambil data produk relevan untuk dijadikan context fakta
-        $katalogTeks = $this->productService->formatKatalogTeks($userMessage);
+        // Ambil data produk toko untuk dijadikan context fakta bagi AI
+        $katalogTeks = $this->productService->formatKatalogTeks();
 
         $systemInstruction = $this->buildSystemInstruction($katalogTeks, $contextTambahan);
         $contents = $this->buildContentsPayload($conversationHistory, $userMessage);
@@ -199,20 +199,67 @@ PROMPT;
      */
     protected function fallbackOfflineResponse(string $query): string
     {
-        $produk = $this->productService->cariProduk($query, limit: 5);
+        $lower = strtolower(trim($query));
+
+        // 1. Deteksi sapaan umum (jika diawali sapaan atau hanya berisi sapaan)
+        $greetings = ['halo', 'hai', 'hello', 'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam', 'assalamualaikum', 'pagi', 'siang', 'sore', 'malam'];
+        foreach ($greetings as $g) {
+            if ($lower === $g || str_starts_with($lower, $g.' ') || str_starts_with($lower, $g.',') || str_starts_with($lower, $g.'!')) {
+                if (mb_strlen($lower) <= mb_strlen($g) + 6) {
+                    return "Halo! 👋 Selamat datang di TokoSembwko.\n\n"
+                        ."Kami menyediakan berbagai kebutuhan pokok sehari-hari:\n"
+                        ."• 🌾 Beras (Pandan Wangi Super, Setra Ramos, Rojolele)\n"
+                        ."• 🍳 Minyak Goreng (Bimoli, Sania, SunCo, Tropical)\n"
+                        ."• 🧂 Gula Pasir (Gulaku Premium, Rose Brand)\n"
+                        ."• 🥚 Telur Ayam Negeri Segar\n"
+                        ."• 🍞 Tepung Terigu Segitiga Biru & Garam Beryodium\n"
+                        ."• 🍜 Mie Instan Indomie\n\n"
+                        .'Ada produk sembako yang ingin Anda cari atau pesan hari ini?';
+                }
+            }
+        }
+
+        $keywords = $this->productService->ekstrakKataKunci($query);
+
+        // 2. Permintaan daftar/katalog umum jika tidak ada kata kunci produk spesifik
+        if (empty($keywords)) {
+            $semuaProduk = $this->productService->cariProduk(limit: 10);
+            $items = [];
+            foreach ($semuaProduk as $p) {
+                $harga = 'Rp '.number_format((float) $p->harga, 0, ',', '.');
+                $stok = $p->stok > 0 ? "stok: {$p->stok} {$p->satuan}" : 'stok habis';
+                $items[] = "• {$p->nama_produk} ({$harga} / {$p->satuan}) - {$stok}";
+            }
+
+            return "Berikut daftar produk sembako yang tersedia di TokoSembwko:\n\n"
+                .implode("\n", $items)
+                ."\n\n💡 *Cara Pesan Mudah:* Ketik *pesan [Nama Produk] [Jumlah]* (contoh: *pesan telur ayam 1kg* atau *pesan minyak sania 2*)";
+        }
+
+        // 3. Pencarian produk spesifik di database
+        $produk = $this->productService->cariProduk($query, limit: 6);
 
         if ($produk->isEmpty()) {
-            return "Halo! Asisten AI sedang dalam mode katalog lokal. Kami tidak menemukan produk yang cocok dengan '{$query}'. Silakan lihat katalog produk lengkap kami di beranda TokoSembwko.";
+            return "Mohon maaf, kami belum menemukan produk yang cocok dengan pencarian '{$query}'. 🙏\n\n"
+                ."Produk sembako yang sedang ready di toko kami antara lain:\n"
+                ."• Telur Ayam Negeri Segar 1 Kg\n"
+                ."• Minyak Goreng Bimoli 2L, Sania 2L, SunCo 2L\n"
+                ."• Beras Pandan Wangi 5 Kg, Setra Ramos 5 Kg, Rojolele 5 Kg\n"
+                ."• Gula Pasir Gulaku 1 Kg, Rose Brand 1 Kg\n"
+                ."• Tepung Segitiga Biru 1 Kg & Indomie\n\n"
+                .'Silakan ketik nama produk yang ingin Anda cari!';
         }
 
         $items = [];
         foreach ($produk as $p) {
             $harga = 'Rp '.number_format((float) $p->harga, 0, ',', '.');
-            $stok = $p->stok > 0 ? "stok: {$p->stok} {$p->satuan}" : 'stok habis';
-            $items[] = "• {$p->nama_produk} ({$harga} / {$p->satuan}) - {$stok}";
+            $stok = $p->stok > 0 ? "Stok: {$p->stok} {$p->satuan}" : 'Stok Kosong';
+            $items[] = "• *{$p->nama_produk}*\n  Harga: {$harga} / {$p->satuan} | {$stok}";
         }
 
-        return "Halo! Berikut beberapa produk yang sesuai dari katalog kami:\n\n".implode("\n", $items)."\n\nAda yang ingin Anda pesan?";
+        return "Halo! Berikut produk yang tersedia di TokoSembwko sesuai pencarian Anda:\n\n"
+            .implode("\n\n", $items)
+            ."\n\n💡 *Ingin memesan?*\nKetik: *pesan [Nama Produk] [Jumlah]*\nContoh: *pesan telur ayam negeri 1kg* atau *beli minyak bimoli 2*";
     }
 
     /**
