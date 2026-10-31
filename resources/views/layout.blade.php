@@ -39,8 +39,7 @@
               <span class="lh-1">{{ auth()->user()->nama_user }}<small>User</small></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><span class="dropdown-item-text small text-muted">{{ auth()->user()->email }}</span></li>
-              <li><a class="dropdown-item" href="{{ route('keranjang.index') }}">Keranjang Saya</a></li>
+              <li><a class="dropdown-item" href="{{ route('profil') }}">Profil Saya</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><form action="{{ route('logout') }}" method="POST">@csrf<button class="dropdown-item">Logout</button></form></li>
             </ul>

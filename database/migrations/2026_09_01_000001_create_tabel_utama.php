@@ -35,7 +35,7 @@ return new class extends Migration
         // Tabel keranjang
         Schema::create('keranjang', function (Blueprint $table) {
             $table->increments('id_keranjang');
-            $table->unsignedBigInteger('id_user');
+            $table->unsignedInteger('id_user');
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
         });
 
@@ -53,7 +53,7 @@ return new class extends Migration
         // Tabel transaksi
         Schema::create('transaksi', function (Blueprint $table) {
             $table->increments('id_transaksi');
-            $table->unsignedBigInteger('id_user');
+            $table->unsignedInteger('id_user');
             $table->unsignedInteger('id_keranjang')->nullable();
             $table->decimal('total_harga', 15, 2)->default(0);
             $table->string('status', 30)->default('diproses');

@@ -43,11 +43,11 @@
   @forelse($produk as $p)
     @if($loop->first)<div class="gm-grid">@endif
     <article class="gm-card">
-      <div class="gm-img">
+      <a href="{{ route('produk.show',$p->id_produk) }}" class="gm-img">
         @if($p->gambar_url)<img src="{{ $p->gambar_url }}" alt="{{ $p->nama_produk }}" loading="lazy">
         @else @include('icon',['n'=>'image']) @endif
-      </div>
-      <h3 class="gm-name">{{ $p->nama_produk }}</h3>
+      </a>
+      <h3 class="gm-name"><a href="{{ route('produk.show',$p->id_produk) }}">{{ $p->nama_produk }}</a></h3>
       <div class="gm-sub">{{ optional($p->kategori)->nama_kategori }}{{ $p->satuan ? ' · '.$p->satuan : '' }}</div>
       <div class="gm-price">Rp {{ number_format($p->harga, 0, ',', '.') }}</div>
       <div><span class="gm-stok {{ $p->stok <= 10 ? 'low' : '' }}">Stok {{ $p->stok }}</span></div>

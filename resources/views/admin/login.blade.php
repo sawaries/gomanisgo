@@ -17,7 +17,8 @@
     <label class="au-lb">Email</label>
     <input name="email" type="email" value="{{ old('email') }}" class="au-in" placeholder="admin@gomanisgo.com" required>
     <label class="au-lb">Password</label>
-    <input name="password" type="password" class="au-in" placeholder="Password" required>
+    <input name="password" type="password" class="au-in pw" placeholder="Password" required>
+    <label class="au-chk"><input type="checkbox" onchange="this.form.querySelectorAll('.pw').forEach(i=>i.type=this.checked?'text':'password')"> Tampilkan password</label>
     <button class="au-btn dark">Masuk</button>
   </form>
 </body>

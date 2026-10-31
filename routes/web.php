@@ -13,15 +13,19 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\WhatsAppWebhookController;
+use App\Http\Controllers\DetailProdukController;
+use App\Http\Controllers\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('toko')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/produk/{id}', [DetailProdukController::class, 'show'])->name('produk.detail');
 
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
 
     Route::middleware('auth:web')->group(function () {
         Route::post('/keranjang/add/{id}', [KeranjangController::class, 'add'])->name('keranjang.add');
@@ -35,6 +39,8 @@ Route::middleware('toko')->group(function () {
         Route::post('/transaksi/{id}/batal', [TransaksiController::class, 'batal'])->name('transaksi.batal');
         Route::post('/chatbot/message', [ChatbotController::class, 'message'])->name('chatbot.message');
         Route::get('/chatbot/search', [ChatbotController::class, 'search'])->name('chatbot.search');
+        Route::get('/profil', [ProfilController::class,'show'])->name('profil');
+        Route::put('/profil', [ProfilController::class,'update'])->name('profil.update');
     });
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -58,3 +64,4 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('pesanan', [PesananController::class, 'index'])->name('pesanan.index');
     Route::put('pesanan/{id}/status', [PesananController::class, 'updateStatus'])->name('pesanan.status');
 });
+
