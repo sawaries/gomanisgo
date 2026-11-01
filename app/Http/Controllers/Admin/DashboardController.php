@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function index()
     {
         $stat = [
-            'kategori' => Kategori::whereHas('produk', fn ($q) => $q->where('status', 1))->count(),
+            'kategori'=>Kategori::where('status',1)->count(),
             'produk' => Produk::where('status', 1)->count(),
             'penjualan' => Transaksi::where('status', 'selesai')->count(),
             'pendapatan' => Transaksi::where('status', 'selesai')->sum('total_harga'),

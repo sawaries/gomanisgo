@@ -33,7 +33,7 @@ class PenjualanController extends Controller
             'L' => Laporan::semua(),
             'bulan' => $bulan,
             'riwayat' => $this->riwayat($bulan)->reverse()->values(),
-            'kategoriAktif' => Kategori::whereHas('produk', fn ($q) => $q->where('status', 1))->count(),
+            'kategoriAktif'=>Kategori::where('status',1)->count(),
         ]);
     }
 

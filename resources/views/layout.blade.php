@@ -10,7 +10,7 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark gm-nav sticky-top">
     <div class="container-xl">
-      <a class="gm-brand" href="{{ route('home') }}"><i>@include('icon',['n'=>'bag'])</i><span>Go<b>ManisGo</b></span></a>
+      <a class="gm-brand" href="{{ route('home') }}"><img src="{{ asset('images/logo1.png') }}" width="45" alt="GoManisGo" class="gm-logo"><span>Go<b>ManisGo</b></span></a>
       <button class="navbar-toggler border-0" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
 
       <div class="collapse navbar-collapse" id="menu">

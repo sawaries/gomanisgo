@@ -19,6 +19,8 @@ $ic=[
 'trend'=>'<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
 'download'=>'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
 'menu'=>'<path d="M4 6h16M4 12h16M4 18h16"/>',
+'chev-l'=>'<path d="m15 18-6-6 6-6"/>',
+'chev-r'=>'<path d="m9 18 6-6-6-6"/>',
 ];
 @endphp
 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $ic[$n] ?? '' !!}</svg>

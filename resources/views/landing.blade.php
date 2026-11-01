@@ -12,14 +12,17 @@
     <h2 class="gm-title">Kategori</h2>
     <a href="{{ route('home') }}#produk" class="gm-link">Lihat Semua &gt;</a>
   </div>
-  <div class="gm-cats">
-    @foreach($kategori as $k)
-      <a href="{{ route('home', ['kategori'=>$k->id_kategori]) }}#produk"
-         class="gm-cat {{ request('kategori') == $k->id_kategori ? 'active' : '' }}">
-        @if($k->gambar_url)<img src="{{ $k->gambar_url }}" alt="" loading="lazy">@endif{{ $k->nama_kategori }}
-      </a>
-    @endforeach
-  </div>
+  <div class="cat-wrap">
+  <button type="button" class="cat-btn" onclick="geser(-1)" aria-label="Sebelumnya">@include('icon',['n'=>'chev-l'])</button>
+    <div class="cat-track" id="catTrack">
+      @foreach($kategori as $k)
+        <a href="{{ route('home', ['kategori'=>$k->id_kategori]) }}#produk"
+           class="gm-cat {{ request('kategori') == $k->id_kategori ? 'active' : '' }}">{{ $k->nama_kategori }}</a>
+      @endforeach
+    </div>
+    <button type="button" class="cat-btn" onclick="geser(1)" aria-label="Berikutnya">@include('icon',['n'=>'chev-r'])</button>
+</div>
+<script>const geser=d=>document.getElementById('catTrack').scrollBy({left:d*300,behavior:'smooth'});</script>
 </section>
 
 {{-- Produk --}}

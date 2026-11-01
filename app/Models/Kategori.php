@@ -16,8 +16,9 @@ class Kategori extends Model
         'nama_kategori',
         'deskripsi',
         'gambar',
+        'status',
     ];
-
+    protected $casts = ['status' => 'boolean'];
     public function getGambarUrlAttribute()
     {
         return $this->gambar ? asset('storage/'.$this->gambar) : null;
