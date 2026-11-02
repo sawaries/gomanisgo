@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('nama_kategori', 100);
             $table->text('deskripsi')->nullable();
             $table->string('gambar')->nullable();
+            $table->tinyInteger('status')->default(1)->comment('0 = Nonaktif, 1 = Aktif');
         });
 
         // Tabel produk

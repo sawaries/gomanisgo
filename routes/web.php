@@ -62,4 +62,5 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::resource('kategori', KategoriController::class)->except(['create', 'edit', 'show']);
     Route::get('pesanan', [PesananController::class, 'index'])->name('pesanan.index');
     Route::put('pesanan/{id}/status', [PesananController::class, 'updateStatus'])->name('pesanan.status');
+    Route::put('kategori/{id}/status', [KategoriController::class, 'toggle'])->name('kategori.toggle');
 });

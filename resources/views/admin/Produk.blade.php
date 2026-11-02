@@ -97,7 +97,8 @@
       <img id="pvi" hidden alt="">
       <span>Pilih berkas atau tarik ke sini</span>
       <small>Format PNG, JPG maks. 2MB</small>
-      <input type="file" name="gambar" accept="image/png,image/jpeg" hidden onchange="pv(this.files[0]?URL.createObjectURL(this.files[0]):'')">
+      <span id="pvn" class="ad-ok" hidden></span>
+      <input type="file" name="gambar" accept="image/png,image/jpeg" hidden onchange="pv(this.files[0]?URL.createObjectURL(this.files[0]):'',this.files[0]?'Gambar dipilih: '+this.files[0].name:'')"
     </label>
     <div class="ad-row ad-mt">
       <div><b class="ad-sm">Status Penjualan</b><div class="ad-mut">Produk dapat dibeli jika aktif</div></div>
@@ -117,7 +118,7 @@ function buka(p,keep){
   g('ttl').textContent=id?'Edit Produk':'Tambah Produk Baru';
   if(!keep){
     ['nama_produk','id_kategori','satuan','harga','stok','deskripsi'].forEach(n=>f[n].value=p?(p[n]??''):'');
-    g('st').checked=p?!!+p.status:true; f.gambar.value=''; pv(p&&p.gambar_url||'');
+    g('st').checked=p?!!+p.status:true; f.gambar.value=''; pv(p&&p.gambar_url||'','Gambar saat ini (pilih berkas baru untuk mengganti)');
   }
   dr(true);
 }

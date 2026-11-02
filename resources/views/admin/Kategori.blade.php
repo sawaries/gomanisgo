@@ -8,18 +8,22 @@
   <div class="ad-bar"><button type="button" class="ad-btn ad-end" onclick="buka()">@include('icon',['n'=>'plus']) Tambah Kategori</button></div>
   <div class="ad-tbl-w">
     <table class="ad-tbl">
-      <thead><tr><th>Foto</th><th>Nama Kategori</th><th>Deskripsi</th><th>Produk</th><th>Aksi</th></tr></thead>
+      <thead><tr><th>Nama Kategori</th><th>Deskripsi</th><th>Produk</th><th>Status</th><th>Aksi</th></tr></thead>
       <tbody>
       @forelse($kategori as $k)
         <tr>
-          <td><div class="ad-th">@if($k->gambar_url)<img src="{{ $k->gambar_url }}" alt="">@else @include('icon',['n'=>'image']) @endif</div></td>
           <td><b>{{ $k->nama_kategori }}</b></td>
           <td class="ad-wrapcell">{{ $k->deskripsi ?: '-' }}</td>
           <td><span class="ad-badge off">{{ $k->produk_count }}</span></td>
           <td>
+            <form method="POST" action="{{ route('admin.kategori.toggle',$k->id_kategori) }}">@csrf @method('PUT')
+              <input type="checkbox" class="ad-sw" @checked($k->status) onchange="this.form.submit()" title="Aktif / Nonaktif">
+            </form>
+          </td>
+          <td>
             <div class="ad-act">
               <button type="button" class="ad-ic" onclick="buka(JSON.parse(this.dataset.p))"
-                data-p="{{ json_encode($k->only(['id_kategori','nama_kategori','deskripsi'])+['gambar_url'=>$k->gambar_url]) }}">@include('icon',['n'=>'pencil'])</button>
+                data-p="{{ json_encode($k->only(['id_kategori','nama_kategori','deskripsi','status'])) }}">@include('icon',['n'=>'pencil'])</button>
               <form method="POST" action="{{ route('admin.kategori.destroy',$k->id_kategori) }}" onsubmit="return confirm('Hapus kategori ini?')">
                 @csrf @method('DELETE')<button class="ad-ic red">@include('icon',['n'=>'trash'])</button>
               </form>
@@ -35,7 +39,7 @@
 </div>
 
 <div class="ad-ov" id="ovd" onclick="dr(false)"></div>
-<form class="ad-dr" id="frm" method="POST" enctype="multipart/form-data">
+<form class="ad-dr" id="frm" method="POST">
   @csrf
   <input type="hidden" name="_method" id="mt" value="PUT" disabled>
   <input type="hidden" name="_id" id="pid" value="{{ old('_id') }}">
@@ -46,14 +50,10 @@
     <input class="ad-in" name="nama_kategori" value="{{ old('nama_kategori') }}" placeholder="Contoh: Gula" required>
     <label class="ad-lb">Deskripsi</label>
     <textarea class="ad-in" name="deskripsi" rows="3" placeholder="Deskripsi singkat kategori...">{{ old('deskripsi') }}</textarea>
-    <label class="ad-lb">Foto Kategori</label>
-    <label class="ad-drop" id="dz">
-      @include('icon',['n'=>'image'])
-      <img id="pvi" hidden alt="">
-      <span>Pilih berkas atau tarik ke sini</span>
-      <small>Format PNG, JPG maks. 2MB</small>
-      <input type="file" name="gambar" accept="image/png,image/jpeg" hidden onchange="pv(this.files[0]?URL.createObjectURL(this.files[0]):'')">
-    </label>
+    <div class="ad-row ad-mt">
+      <div><b class="ad-sm">Status Kategori</b><div class="ad-mut">Kategori tampil di toko jika aktif</div></div>
+      <input type="hidden" name="status" value="0"><input type="checkbox" class="ad-sw" name="status" value="1" id="st" checked>
+    </div>
   </div>
   <div class="ad-dr-f"><button type="button" class="ad-btn out" onclick="dr(false)">Batal</button><button class="ad-btn">@include('icon',['n'=>'check']) Simpan</button></div>
 </form>
@@ -68,7 +68,7 @@ function buka(p,keep){
   g('ttl').textContent=id?'Edit Kategori':'Tambah Kategori Baru';
   if(!keep){
     ['nama_kategori','deskripsi'].forEach(n=>f[n].value=p?(p[n]??''):'');
-    f.gambar.value=''; pv(p&&p.gambar_url||'');
+    g('st').checked=p?!!+p.status:true;
   }
   dr(true);
 }

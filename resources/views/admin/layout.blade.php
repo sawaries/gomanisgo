@@ -9,7 +9,7 @@
 <body class="ad">
   <header class="ad-top">
     <button class="ad-burger" onclick="sb(true)">@include('icon',['n'=>'menu'])</button>
-    <a class="gm-brand" href="{{ route('admin.dashboard') }}"><i>@include('icon',['n'=>'bag'])</i><span>Go<b>ManisGo</b><small>Admin</small></span></a>
+    <a class="gm-brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/logo1.png') }}" width="45" alt="GoManisGo" class="gm-logo"><span>Go<b>Manis</b>Go</span></a>
     <div class="ad-user">
       <span>{{ auth('admin')->user()->nama_user }}<small>Admin</small></span>
       <div class="ad-ava">{{ strtoupper(substr(auth('admin')->user()->nama_user,0,1)) }}</div>
@@ -39,7 +39,7 @@
     const g=i=>document.getElementById(i);
     const sb=o=>{g('side').classList.toggle('on',o);g('ovs').classList.toggle('on',o)};
     const dr=o=>{g('ovd').classList.toggle('on',o);g('frm').classList.toggle('on',o)};
-    const pv=u=>{g('pvi').hidden=!u;if(u)g('pvi').src=u};
+    const pv=(u,n)=>{g('pvi').hidden=!u;if(u)g('pvi').src=u;g('dz').classList.toggle('ok',!!u);g('pvn').hidden=!u;g('pvn').textContent=u?(n||''):''};
     document.onkeydown=e=>{if(e.key=='Escape'){if(g('frm'))dr(false);sb(false)}};
     const dz=g('dz');
     if(dz){const fi=dz.querySelector('input');

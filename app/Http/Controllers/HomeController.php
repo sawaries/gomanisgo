@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function index(Request $r)
     {
-        $kategori = Kategori::all();
+        $kategori=Kategori::where('status',1)->addSelect(['gambar_contoh'=>Produk::select('gambar')->whereColumn('id_kategori','kategori.id_kategori')->where('status',1)->whereNotNull('gambar')->orderBy('id_produk')->limit(1)])->get();
         $urut = $r->urut ?? 'terbaru';
         $produk = Produk::with('kategori')->where('status', 1)
             ->when($r->kategori, fn ($q) => $q->where('id_kategori', $r->kategori))
