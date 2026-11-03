@@ -37,7 +37,11 @@
           <td>{{ optional($p->kategori)->nama_kategori }}</td>
           <td><b>Rp {{ number_format($p->harga,0,',','.') }}</b></td>
           <td><span class="ad-badge {{ $p->stok<=10 ? 'low' : '' }}">{{ $p->stok }}</span></td>
-          <td><span class="ad-badge {{ $p->status ? '' : 'off' }}">{{ $p->status ? 'Aktif' : 'Nonaktif' }}</span></td>
+          <td>
+            <form method="POST" action="{{ route('admin.produk.toggle',$p->id_produk) }}">@csrf @method('PUT')
+              <input type="checkbox" class="ad-sw" @checked($p->status) onchange="this.form.submit()" title="Aktif / Nonaktif">
+            </form>
+          </td>
           <td>
             <div class="ad-act">
               <button type="button" class="ad-ic" onclick="buka(JSON.parse(this.dataset.p))"
@@ -98,12 +102,8 @@
       <span>Pilih berkas atau tarik ke sini</span>
       <small>Format PNG, JPG maks. 2MB</small>
       <span id="pvn" class="ad-ok" hidden></span>
-      <input type="file" name="gambar" accept="image/png,image/jpeg" hidden onchange="pv(this.files[0]?URL.createObjectURL(this.files[0]):'',this.files[0]?'Gambar dipilih: '+this.files[0].name:'')"
+      <input type="file" name="gambar" accept="image/png,image/jpeg" hidden onchange="pv(this.files[0]?URL.createObjectURL(this.files[0]):'',this.files[0]?'Gambar dipilih: '+this.files[0].name:'')">
     </label>
-    <div class="ad-row ad-mt">
-      <div><b class="ad-sm">Status Penjualan</b><div class="ad-mut">Produk dapat dibeli jika aktif</div></div>
-      <input type="hidden" name="status" value="0"><input type="checkbox" class="ad-sw" name="status" value="1" id="st" checked>
-    </div>
   </div>
   <div class="ad-dr-f"><button type="button" class="ad-btn out" onclick="dr(false)">Batal</button><button class="ad-btn">@include('icon',['n'=>'check']) Simpan Produk</button></div>
 </form>
@@ -118,7 +118,7 @@ function buka(p,keep){
   g('ttl').textContent=id?'Edit Produk':'Tambah Produk Baru';
   if(!keep){
     ['nama_produk','id_kategori','satuan','harga','stok','deskripsi'].forEach(n=>f[n].value=p?(p[n]??''):'');
-    g('st').checked=p?!!+p.status:true; f.gambar.value=''; pv(p&&p.gambar_url||'','Gambar saat ini (pilih berkas baru untuk mengganti)');
+    f.gambar.value=''; pv(p&&p.gambar_url||'','Gambar saat ini (pilih berkas baru untuk mengganti)');
   }
   dr(true);
 }

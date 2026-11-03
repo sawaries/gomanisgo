@@ -9,94 +9,109 @@ return new class extends Migration
     public function up(): void
     {
         // Tabel kategori
-        Schema::create('kategori', function (Blueprint $table) {
-            $table->increments('id_kategori');
-            $table->string('nama_kategori', 100);
-            $table->text('deskripsi')->nullable();
-            $table->string('gambar')->nullable();
-            $table->tinyInteger('status')->default(1)->comment('0 = Nonaktif, 1 = Aktif');
+        Schema::create('kategori', function (Blueprint $t) {
+            $t->integer('id_kategori', true);
+            $t->string('nama_kategori', 100);
+            $t->text('deskripsi')->nullable();
+            $t->string('gambar')->nullable();
+            $t->boolean('status')->default(true);
         });
 
         // Tabel produk
-        Schema::create('produk', function (Blueprint $table) {
-            $table->increments('id_produk');
-            $table->unsignedInteger('id_kategori')->nullable();
-            $table->string('nama_produk', 150);
-            $table->string('sku', 50)->nullable()->unique();
-            $table->string('satuan', 30)->nullable();
-            $table->decimal('harga', 15, 2)->default(0);
-            $table->integer('stok')->default(0);
-            $table->text('deskripsi')->nullable();
-            $table->string('gambar')->nullable();
-            $table->boolean('status')->default(true);
+        Schema::create('produk', function (Blueprint $t) {
+            $t->integer('id_produk', true);
+            $t->integer('id_kategori');
+            $t->string('nama_produk', 150);
+            $t->string('satuan', 30)->nullable();
+            $t->decimal('harga', 12, 2);
+            $t->integer('stok')->default(0);
+            $t->text('deskripsi')->nullable();
+            $t->string('gambar')->nullable();
+            $t->boolean('status')->default(true);
 
-            $table->foreign('id_kategori')->references('id_kategori')->on('kategori')->onDelete('set null');
+            $t->foreign('id_kategori', 'produk_ibfk_1')->references('id_kategori')->on('kategori');
         });
 
         // Tabel keranjang
-        Schema::create('keranjang', function (Blueprint $table) {
-            $table->increments('id_keranjang');
-            $table->unsignedInteger('id_user');
-            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
+        Schema::create('keranjang', function (Blueprint $t) {
+            $t->integer('id_keranjang', true);
+            $t->integer('id_user');
+            $t->dateTime('tanggal_dibuat')->nullable()->useCurrent();
+
+            $t->foreign('id_user', 'keranjang_ibfk_1')->references('id_user')->on('users');
         });
 
         // Tabel detail_keranjang
-        Schema::create('detail_keranjang', function (Blueprint $table) {
-            $table->unsignedInteger('id_keranjang');
-            $table->unsignedInteger('id_produk');
-            $table->integer('jumlah')->default(1);
+        Schema::create('detail_keranjang', function (Blueprint $t) {
+            $t->integer('id_keranjang');
+            $t->integer('id_produk');
+            $t->integer('jumlah');
 
-            $table->primary(['id_keranjang', 'id_produk']);
-            $table->foreign('id_keranjang')->references('id_keranjang')->on('keranjang')->onDelete('cascade');
-            $table->foreign('id_produk')->references('id_produk')->on('produk')->onDelete('cascade');
+            $t->primary(['id_keranjang', 'id_produk']);
+            $t->foreign('id_keranjang', 'detail_keranjang_ibfk_1')->references('id_keranjang')->on('keranjang');
+            $t->foreign('id_produk', 'detail_keranjang_ibfk_2')->references('id_produk')->on('produk');
         });
 
-        // Tabel transaksi
-        Schema::create('transaksi', function (Blueprint $table) {
-            $table->increments('id_transaksi');
-            $table->unsignedInteger('id_user');
-            $table->unsignedInteger('id_keranjang')->nullable();
-            $table->decimal('total_harga', 15, 2)->default(0);
-            $table->string('status', 30)->default('diproses');
-            $table->timestamp('tanggal_transaksi')->nullable()->useCurrent();
+        // Tabel transaksi (id_keranjang nullable karena pesanan chatbot/WhatsApp tanpa keranjang)
+        Schema::create('transaksi', function (Blueprint $t) {
+            $t->integer('id_transaksi', true);
+            $t->integer('id_user');
+            $t->integer('id_keranjang')->nullable();
+            $t->string('sumber', 20)->default('website');
+            $t->string('nomor_wa', 30)->nullable();
+            $t->decimal('total_harga', 12, 2)->default(0);
+            // nilai status disamakan dengan konstanta Transaksi::STATUS
+            $t->enum('status', ['diproses', 'disiapkan', 'siap_diambil', 'selesai', 'dibatalkan'])
+                ->nullable()->default('diproses');
+            $t->text('catatan')->nullable();
+            $t->dateTime('tanggal_transaksi')->nullable()->useCurrent();
 
-            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
-            $table->foreign('id_keranjang')->references('id_keranjang')->on('keranjang')->onDelete('set null');
+            $t->foreign('id_user', 'transaksi_ibfk_1')->references('id_user')->on('users');
+            $t->foreign('id_keranjang', 'transaksi_ibfk_2')->references('id_keranjang')->on('keranjang');
         });
 
         // Tabel detail_transaksi
-        Schema::create('detail_transaksi', function (Blueprint $table) {
-            $table->increments('id_detail_transaksi');
-            $table->unsignedInteger('id_transaksi');
-            $table->unsignedInteger('id_produk');
-            $table->decimal('harga_satuan', 15, 2)->default(0);
-            $table->integer('jumlah')->default(1);
-            $table->decimal('subtotal', 15, 2)->default(0);
+        Schema::create('detail_transaksi', function (Blueprint $t) {
+            $t->integer('id_detail_transaksi', true);
+            $t->integer('id_transaksi');
+            $t->integer('id_produk');
+            $t->string('nama_produk_snapshot', 150)->nullable();
+            $t->decimal('harga_satuan', 12, 2);
+            $t->integer('jumlah');
+            $t->decimal('subtotal', 12, 2);
 
-            $table->foreign('id_transaksi')->references('id_transaksi')->on('transaksi')->onDelete('cascade');
-            $table->foreign('id_produk')->references('id_produk')->on('produk')->onDelete('cascade');
+            $t->foreign('id_transaksi', 'detail_transaksi_ibfk_1')->references('id_transaksi')->on('transaksi');
+            $t->foreign('id_produk', 'detail_transaksi_ibfk_2')->references('id_produk')->on('produk');
         });
 
         // Tabel pembayaran
-        Schema::create('pembayaran', function (Blueprint $table) {
-            $table->increments('id_pembayaran');
-            $table->unsignedInteger('id_transaksi');
-            $table->string('metode_pembayaran', 50)->nullable();
-            $table->decimal('total_bayar', 15, 2)->default(0);
-            $table->string('status_pembayaran', 30)->default('menunggu');
+        Schema::create('pembayaran', function (Blueprint $t) {
+            $t->integer('id_pembayaran', true);
+            $t->integer('id_transaksi')->unique();
+            $t->enum('metode_pembayaran', ['COD'])->nullable()->default('COD');
+            $t->decimal('total_bayar', 12, 2);
+            $t->enum('status_pembayaran', ['Belum Dibayar', 'Lunas'])->nullable()->default('Belum Dibayar');
+            $t->dateTime('tanggal_pembayaran')->nullable();
 
-            $table->foreign('id_transaksi')->references('id_transaksi')->on('transaksi')->onDelete('cascade');
+            $t->foreign('id_transaksi', 'pembayaran_ibfk_1')->references('id_transaksi')->on('transaksi');
+        });
+
+        // Tabel produk_dilihat
+        Schema::create('produk_dilihat', function (Blueprint $t) {
+            $t->integer('id_user');
+            $t->integer('id_produk');
+            $t->timestamp('dilihat_pada')->useCurrent();
+
+            $t->primary(['id_user', 'id_produk']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('pembayaran');
-        Schema::dropIfExists('detail_transaksi');
-        Schema::dropIfExists('transaksi');
-        Schema::dropIfExists('detail_keranjang');
-        Schema::dropIfExists('keranjang');
-        Schema::dropIfExists('produk');
-        Schema::dropIfExists('kategori');
+        Schema::disableForeignKeyConstraints();
+        foreach (['produk_dilihat', 'pembayaran', 'detail_transaksi', 'transaksi', 'detail_keranjang', 'keranjang', 'produk', 'kategori'] as $tb) {
+            Schema::dropIfExists($tb);
+        }
+        Schema::enableForeignKeyConstraints();
     }
 };

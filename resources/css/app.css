@@ -1,11 +1,14 @@
 @import 'tailwindcss';
 
+@font-face{font-family:'Centra';src:url('/fonts/CentraNo1-Book.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Centra';src:url('/fonts/CentraNo1-Medium.otf') format('opentype');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Centra';src:url('/fonts/CentraNo1-Bold.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Centra', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* ===== GoManisGo: Home ===== */
@@ -13,6 +16,9 @@
 
 body{background:#f6f4f2;font-family:var(--font-sans);color:#1f2937;min-height:100vh;display:flex;flex-direction:column}
 main{flex:1}
+:root{--bs-body-font-family:var(--font-sans);--bs-font-sans-serif:var(--font-sans)}
+button,input,select,textarea,.btn,.form-control,.form-select{font-family:inherit}
+h1,h2,h3,.gm-title,.ch-title,.kr-title,.ad-h,.au-title,.pd-info h1,.pf-id h2,.gm-hero h1{font-weight:700}
 img{max-width:100%}
 
 /* Navbar */
@@ -37,7 +43,7 @@ img{max-width:100%}
 .gm-hero p{font-size:clamp(.78rem,2vw,.9rem);margin:.4rem 0 0;opacity:.9}
 
 /* Section */
-.gm-title{font-size:1rem;font-weight:600;margin:0}
+.gm-title{font-size:1rem;font-weight:700;margin:0}
 .gm-link{font-size:.8rem;color:var(--color-oranye);text-decoration:none;font-weight:500}
 
 /* Category */
@@ -271,7 +277,7 @@ img{max-width:100%}
 .ds-card b{display:block;margin-top:.6rem;font-size:1.6rem;font-weight:700;color:#f59e0b}
 .ch-card{padding:1.25rem 1.5rem;margin-bottom:1rem}
 .ch-head{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem}
-.ch-title{font-size:1.2rem;font-weight:600;margin:0}
+.ch-title{font-size:1.2rem;font-weight:700;margin:0}
 .ch-kpis{display:flex;flex-wrap:wrap;gap:1rem 2.5rem;padding:.8rem 0 1rem;margin-bottom:.8rem;border-bottom:1px solid #e5e7eb}
 .ch-kpi small{display:block;font-size:.72rem;color:#6b7280}
 .ch-kpi b{font-size:1.6rem;font-weight:500}

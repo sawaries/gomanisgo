@@ -35,8 +35,7 @@
   </select>
 </form>
 
-<div class="ps-wrap">
-  <div class="ps-col">
+<div class="ps-col ad-mt">
     {{-- Daftar pesanan --}}
     <section class="ad-card ch-card">
       <div class="ch-head">
@@ -92,12 +91,17 @@
         <p class="ad-mut">Belum ada riwayat dalam 30 hari terakhir.</p>
       @endforelse
     </section>
-  </div>
+</div>
 
-  {{-- Detail pesanan --}}
-  <aside class="ps-side ad-card ch-card">
+{{-- Detail pesanan (pop-up, muncul saat baris diklik) --}}
+<div class="ad-ov {{ $sel ? 'on' : '' }}" id="ovd" onclick="dr(false)"></div>
+<aside class="ad-dr {{ $sel ? 'on' : '' }}" id="frm">
+  <div class="ad-dr-h">
+    <span>Detail Pesanan @if($sel)<span class="tx-b {{ $sel->status }}">{{ \App\Models\Transaksi::STATUS[$sel->status] }}</span>@endif</span>
+    <button type="button" class="ad-ic" onclick="dr(false)">@include('icon',['n'=>'x'])</button>
+  </div>
+  <div class="ad-dr-b">
     @if($sel)
-      <div class="ch-head"><h2 class="ch-title">Detail Pesanan</h2><span class="tx-b {{ $sel->status }}">{{ \App\Models\Transaksi::STATUS[$sel->status] }}</span></div>
       <div class="ps-id">
         <i class="ps-ava">{{ strtoupper(substr(optional($sel->user)->nama_user ?? 'P',0,2)) }}</i>
         <div><b>#{{ $sel->kode }}</b><div class="ad-mut">{{ $tgl($sel) }}</div></div>
@@ -137,22 +141,13 @@
               <button class="ad-btn or ad-full">@include('icon',['n'=>'box']) {{ $lanjut[$sel->status][1] }}</button>
             </form>
           @endif
-          <form method="POST" action="{{ route('admin.pesanan.status',$sel->id_transaksi) }}">@csrf @method('PUT')
-            <select name="status" class="ad-in" onchange="if(this.value)this.form.submit()">
-              <option value="">Ubah Status</option>
-              @foreach(\App\Models\Transaksi::STATUS as $k=>$l)@if($k!=$sel->status && $k!='dibatalkan')<option value="{{ $k }}">{{ $l }}</option>@endif @endforeach
-            </select>
-          </form>
           <form method="POST" action="{{ route('admin.pesanan.status',$sel->id_transaksi) }}" onsubmit="return confirm('Batalkan pesanan ini? Stok akan dikembalikan.')">@csrf @method('PUT')
             <input type="hidden" name="status" value="dibatalkan">
             <button class="ad-btn red ad-full">@include('icon',['n'=>'trash']) Batalkan</button>
           </form>
         </div>
       @endif
-    @else
-      <div class="ch-head"><h2 class="ch-title">Detail Pesanan</h2></div>
-      <p class="ad-mut">Pilih pesanan di daftar untuk melihat detailnya.</p>
     @endif
-  </aside>
-</div>
+  </div>
+</aside>
 @endsection

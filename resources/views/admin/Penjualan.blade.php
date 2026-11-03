@@ -3,10 +3,6 @@
 @section('content')
 <h1 class="ad-h">Laporan Penjualan</h1>
 
-<div class="ds-stats ds-one">
-  <div class="ds-card"><small>Kategori Aktif</small><b>{{ number_format($kategoriAktif,0,',','.') }}</b></div>
-</div>
-
 @include('admin.partials.charts')
 @include('admin.partials.aktif')
 

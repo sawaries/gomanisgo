@@ -25,7 +25,7 @@ class PesananController extends Controller
                 ->when($num, fn ($w2) => $w2->orWhere('id_transaksi', $num))))
             ->orderBy('id_transaksi', $urut)->get();
 
-        $sel = ($r->id ? Transaksi::with($with)->find($r->id) : null) ?? $list->first();
+        $sel = $r->id ? Transaksi::with($with)->find($r->id) : null; // detail hanya muncul saat baris diklik
 
         $aktif = Transaksi::aktif();
         $stat = [

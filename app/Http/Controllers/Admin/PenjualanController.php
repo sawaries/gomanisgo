@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kategori;
+use App\Models\Produk;
 use App\Models\Transaksi;
 use App\Support\Laporan;
 use App\Support\Xlsx;
@@ -33,7 +34,10 @@ class PenjualanController extends Controller
             'L' => Laporan::semua(),
             'bulan' => $bulan,
             'riwayat' => $this->riwayat($bulan)->reverse()->values(),
-            'kategoriAktif'=>Kategori::where('status',1)->count(),
+            'kategori'=>Kategori::where('status',1)->count(),
+            'produk'=>\App\Models\Produk::where('status',1)->count(),
+            'penjualan'=>Transaksi::where('status','selesai')->count(),
+            'pendapatan'=>Transaksi::where('status','selesai')->sum('total_harga'),
         ]);
     }
 

@@ -34,7 +34,6 @@ class ProdukController extends Controller
             'gambar' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
         unset($d['gambar']);
-        $d['status'] = $r->boolean('status');
 
         return $d;
     }
@@ -83,6 +82,14 @@ class ProdukController extends Controller
         }
 
         return back()->with($n == count($ids) ? 'success' : 'error', $n.' dari '.count($ids).' produk dihapus (produk yang sudah ada di transaksi tidak bisa dihapus)');
+    }
+
+    // tombol on/off cepat di tabel
+    public function toggle($id)
+    {
+        $p = Produk::findOrFail($id);
+        $p->update(['status' => !$p->status]);
+        return back()->with('success', 'Produk '.($p->status ? 'diaktifkan' : 'dinonaktifkan'));
     }
 
     public function destroy($id)

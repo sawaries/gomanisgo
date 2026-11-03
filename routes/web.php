@@ -58,6 +58,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
     Route::get('penjualan/export', [PenjualanController::class, 'export'])->name('penjualan.export');
     Route::post('produk/bulk', [ProdukController::class, 'bulk'])->name('produk.bulk');
+    Route::put('produk/{id}/status', [ProdukController::class, 'toggle'])->name('produk.toggle');
     Route::resource('produk', ProdukController::class)->except(['create', 'edit', 'show']);
     Route::resource('kategori', KategoriController::class)->except(['create', 'edit', 'show']);
     Route::get('pesanan', [PesananController::class, 'index'])->name('pesanan.index');

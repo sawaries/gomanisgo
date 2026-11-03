@@ -266,7 +266,7 @@ class OrderService
                     'catatan' => 'Pesanan otomatis via '.($sumber === 'website' ? 'AI Chatbot Website' : 'WhatsApp Bot'),
                 ]);
 
-                // 4. Buat Detail Transaksi dan kurangi stok produk secara atomik
+                // 4. Buat Detail Transaksi (stok berkurang lewat trigger)
                 foreach ($items as $item) {
                     $produk = Produk::find($item['id_produk']);
 
@@ -279,8 +279,7 @@ class OrderService
                         'subtotal' => $produk->harga * $item['jumlah'],
                     ]);
 
-                    // Kurangi stok
-                    $produk->decrement('stok', $item['jumlah']);
+                    // Stok dikurangi otomatis oleh trigger_kurangi_stok
                 }
 
                 // 5. Buat Pembayaran COD

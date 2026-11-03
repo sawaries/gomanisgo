@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-
 return new class extends Migration
 {
     public function up(): void
@@ -29,7 +28,14 @@ return new class extends Migration
             JOIN produk p ON dt.id_produk = p.id_produk
             JOIN pembayaran pb ON t.id_transaksi = pb.id_transaksi");
 
-        // ---- Procedures (buat_transaksi dibuat di migration ubah_status_transaksi_dan_prosedur) ----
+        // ---- Procedures ----
+        DB::unprepared('DROP PROCEDURE IF EXISTS buat_transaksi');
+        DB::unprepared("CREATE PROCEDURE buat_transaksi(IN p_id_user INT, IN p_id_keranjang INT)
+            BEGIN
+                INSERT INTO transaksi (id_user, id_keranjang, total_harga, status)
+                VALUES (p_id_user, p_id_keranjang, 0, 'diproses');
+            END");
+
         DB::unprepared('DROP PROCEDURE IF EXISTS tambah_produk');
         DB::unprepared("CREATE PROCEDURE tambah_produk(IN p_id_kategori INT, IN p_nama_produk VARCHAR(150), IN p_harga DECIMAL(12,2), IN p_stok INT)
             BEGIN
@@ -92,6 +98,7 @@ return new class extends Migration
         }
         DB::unprepared('DROP FUNCTION IF EXISTS hitung_subtotal');
         DB::unprepared('DROP FUNCTION IF EXISTS hitung_total_transaksi');
+        DB::unprepared('DROP PROCEDURE IF EXISTS buat_transaksi');
         DB::unprepared('DROP PROCEDURE IF EXISTS tambah_produk');
         DB::unprepared('DROP PROCEDURE IF EXISTS tambah_user');
         DB::unprepared('DROP VIEW IF EXISTS view_detail_transaksi');
