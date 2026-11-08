@@ -10,6 +10,7 @@
   <label class="au-lb">Password</label>
   <input name="password" type="password" class="au-in pw" placeholder="Password" required>
   <label class="au-chk"><input type="checkbox" onchange="this.form.querySelectorAll('.pw').forEach(i=>i.type=this.checked?'text':'password')"> Tampilkan password</label>
+  <a href="{{ route('resetpassword.email') }}" class="au-link">Lupa password?</a>
   <button class="au-btn">Masuk</button>
   <a href="{{ route('register') }}" class="au-link">Belum punya akun? Daftar</a>
 </form>

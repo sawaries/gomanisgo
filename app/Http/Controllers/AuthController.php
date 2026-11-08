@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Rules\RealEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // app/Http/Controllers/AuthController.php
     public function loginForm()
     {
         return view('auth.login');
@@ -36,9 +36,10 @@ class AuthController extends Controller
 
     public function register(Request $r)
     {
+        $r->merge(['email' => strtolower(trim((string) $r->email))]);
         $data = $r->validate([
             'nama_user' => 'required', 'no_telepon' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => ['required', 'max:100', 'email:rfc,dns', new RealEmail, 'unique:users,email'],
             'password' => 'required|min:6',
         ]);
         $data['password'] = Hash::make($data['password']);

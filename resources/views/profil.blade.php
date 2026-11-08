@@ -92,6 +92,8 @@
       <input name="password_lama" type="password" class="au-in pw" autocomplete="current-password">
       <label class="au-lb">Password baru</label>
       <input name="password_baru" type="password" class="au-in pw" placeholder="Kosongkan jika tidak diubah" autocomplete="new-password">
+      <label class="au-lb">Konfirmasi password baru</label>
+      <input name="password_baru_confirmation" type="password" class="au-in pw" placeholder="Ulangi password baru" autocomplete="new-password">
       <label class="au-chk"><input type="checkbox" onchange="this.form.querySelectorAll('.pw').forEach(i=>i.type=this.checked?'text':'password')"> Tampilkan password</label>
     </div>
     <div class="md-f"><button type="button" class="gm-btn out" onclick="tutup()">Batal</button><button class="gm-btn">Simpan</button></div>

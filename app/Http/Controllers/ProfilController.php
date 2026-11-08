@@ -24,7 +24,7 @@ class ProfilController extends Controller {
             'nama_user'=>'required|max:100',
             'no_telepon'=>'required|max:20',
             'email'=>'required|email|max:100|unique:users,email,'.$u->id_user.',id_user',
-            'password_baru'=>'nullable|min:6',
+            'password_baru'=>'nullable|min:6|confirmed',
             'password_lama'=>'required_with:password_baru',
         ]);
         if($r->filled('password_baru')){

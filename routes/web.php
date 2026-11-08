@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PenjualanController;
@@ -25,6 +26,13 @@ Route::middleware('toko')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/resetpassword', [ResetPasswordController::class, 'forgotForm'])->name('resetpassword.email');
+    Route::post('/resetpassword', [ResetPasswordController::class, 'sendOtp'])->name('resetpassword.send')->middleware('throttle:5,1');
+    Route::get('/resetpassword/otp', [ResetPasswordController::class, 'verifyForm'])->name('resetpassword.otp');
+    Route::post('/resetpassword/otp', [ResetPasswordController::class, 'verifyOtp'])->name('resetpassword.otp.verify')->middleware('throttle:10,1');
+    Route::get('/resetpassword/password', [ResetPasswordController::class, 'resetForm'])->name('resetpassword.password');
+    Route::post('/resetpassword/password', [ResetPasswordController::class, 'reset'])->name('resetpassword.update');
 
     Route::middleware('auth:web')->group(function () {
         Route::post('/keranjang/add/{id}', [KeranjangController::class, 'add'])->name('keranjang.add');
