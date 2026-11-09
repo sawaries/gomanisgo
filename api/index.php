@@ -1,24 +1,19 @@
 <?php
 
-// Vercel PHP Runtime - Laravel Entry Point
-// This file bridges Vercel's serverless PHP runtime to Laravel
+// Buat folder penyimpan sementara di /tmp untuk Vercel Serverless
+$storagePaths = [
+    '/tmp/framework/views',
+    '/tmp/framework/sessions',
+    '/tmp/framework/cache',
+];
 
-define('LARAVEL_START', microtime(true));
+foreach ($storagePaths as $path) {
+    if (!is_dir($path)) {
+        mkdir($path, 0755, true);
+    }
+}
 
-// Set working directory to project root
-chdir(dirname(__DIR__));
+// Paksa Laravel menggunakan folder /tmp untuk compiled views
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/framework/views';
 
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-
-$request = Illuminate\Http\Request::capture();
-
-$response = $kernel->handle($request);
-
-$response->send();
-
-$kernel->terminate($request, $response);
-
+require __DIR__ . '/../public/index.php';
