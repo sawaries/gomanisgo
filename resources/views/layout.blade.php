@@ -16,9 +16,9 @@
       <div class="collapse navbar-collapse" id="menu">
         @php $jml = auth()->check() ? optional(\App\Models\Keranjang::where('id_user',auth()->id())->withCount('items')->first())->items_count : 0; @endphp
         <ul class="navbar-nav mx-lg-auto my-2 my-lg-0 gap-lg-1">
-          <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#kategori">Kategori</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('home') }}#produk">Produk</a></li>
+          <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" data-spy="home" href="{{ route('home') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" data-spy="kategori" href="{{ route('home') }}#kategori">Kategori</a></li>
+          <li class="nav-item"><a class="nav-link" data-spy="produk" href="{{ route('home') }}#produk">Produk</a></li>
           <li class="nav-item"><a class="nav-link {{ request()->routeIs('transaksi.*') ? 'active' : '' }}" href="{{ auth()->check() ? route('transaksi.index') : route('login') }}">Transaksi</a></li>
           <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('keranjang.*') ? 'active' : '' }}" href="{{ auth()->check() ? route('keranjang.index') : route('login') }}">
@@ -71,6 +71,22 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   @auth
     @include('partials.chatbot')
+
+  <script>
+    (function(){
+      const sk=document.getElementById('kategori'), sp=document.getElementById('produk');
+      if(!sk&&!sp) return; // hanya aktif di beranda
+      const links=[...document.querySelectorAll('[data-spy]')];
+      const top=e=>e.getBoundingClientRect().top+window.scrollY;
+      const cek=()=>{
+        const y=window.scrollY+120; let k='home';
+        if(sk&&y>=top(sk)) k='kategori';
+        if(sp&&(y>=top(sp)||innerHeight+scrollY>=document.body.scrollHeight-2)) k='produk';
+        links.forEach(a=>a.classList.toggle('active',a.dataset.spy===k));
+      };
+      addEventListener('scroll',cek,{passive:true}); addEventListener('resize',cek); cek();
+    })();
+  </script>
   @endauth
 </body>
 </html>

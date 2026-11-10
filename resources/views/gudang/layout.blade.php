@@ -17,7 +17,6 @@
           @if(auth('gudang')->check())
             <form action="{{ route('gudang.logout') }}" method="POST">@csrf<button class="ad-out">Logout</button></form>
           @else
-            <a class="ad-out" href="{{ route('admin.dashboard') }}">Ke Admin</a>
           @endif
         </div>
   </header>

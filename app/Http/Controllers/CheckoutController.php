@@ -58,6 +58,6 @@ class CheckoutController extends Controller
             DetailKeranjang::where('id_keranjang', $items->first()->id_keranjang)->whereIn('id_produk', $items->pluck('id_produk'))->delete();
         });
 
-        return redirect()->route('transaksi.index')->with('success','Pesanan diterima! Tunggu status "Siap Diambil", lalu ambil dan bayar di toko.');
+        return redirect()->route('transaksi.index')->with('pesanan_berhasil','Pantau statusnya di halaman ini. Saat berstatus "Siap Diambil", ambil dan bayar di toko.');
     }
 }

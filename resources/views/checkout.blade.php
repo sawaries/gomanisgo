@@ -45,10 +45,11 @@
         <div class="tot"><span>Total Tagihan</span><b class="gm-price" style="margin:0">Rp {{ number_format($total,0,',','.') }}</b></div>
         <div class="kr-pay">BAYAR DI TOKO (COD)<small style="display:block;font-weight:400">Bayar tunai saat mengambil pesanan.</small></div>
 
-        <form method="POST" action="{{ route('checkout.process') }}" style="margin-top:.8rem">
+        <form method="POST" action="{{ route('checkout.process') }}" style="margin-top:.8rem"
+              onsubmit="const b=this.querySelector('button');b.disabled=true;b.textContent='Memproses...'">
           @csrf
           @foreach($items as $it)<input type="hidden" name="ids[]" value="{{ $it->id_produk }}">@endforeach
-          <button class="gm-btn or">@include('icon',['n'=>'check']) Konfirmasi Pesanan</button>
+          <button class="gm-btn or">Konfirmasi Pesanan</button>
         </form>
         <a href="{{ route('keranjang.index') }}" class="gm-btn out" style="margin-top:.5rem">Kembali ke Keranjang</a>
       </div>

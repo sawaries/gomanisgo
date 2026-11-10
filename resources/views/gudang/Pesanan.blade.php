@@ -49,7 +49,7 @@
           <tbody>
           @forelse($list as $t)
             <tr class="ps-row {{ $sel && $sel->id_transaksi==$t->id_transaksi ? 'sel' : '' }}"
-                onclick="location.href='{{ route('admin.pesanan.index',array_merge(request()->except('id'),['id'=>$t->id_transaksi])) }}'">
+                onclick="location.href='{{ route('gudang.pesanan.index',array_merge(request()->except('id'),['id'=>$t->id_transaksi])) }}'">
               <td><b>#{{ $t->kode }}</b><div class="ad-mut">{{ $tgl($t) }}</div></td>
               <td>
                 @if(($t->sumber ?? 'website') === 'whatsapp')
@@ -136,12 +136,12 @@
       @if(!in_array($sel->status,['selesai','dibatalkan']))
         <div class="ps-btns">
           @if(isset($lanjut[$sel->status]))
-            <form method="POST" action="{{ route('admin.pesanan.status',$sel->id_transaksi) }}">@csrf @method('PUT')
+            <form method="POST" action="{{ route('gudang.pesanan.status',$sel->id_transaksi) }}">@csrf @method('PUT')
               <input type="hidden" name="status" value="{{ $lanjut[$sel->status][0] }}">
               <button class="ad-btn or ad-full">@include('icon',['n'=>'box']) {{ $lanjut[$sel->status][1] }}</button>
             </form>
           @endif
-          <form method="POST" action="{{ route('admin.pesanan.status',$sel->id_transaksi) }}" onsubmit="return confirm('Batalkan pesanan ini? Stok akan dikembalikan.')">@csrf @method('PUT')
+          <form method="POST" action="{{ route('gudang.pesanan.status',$sel->id_transaksi) }}" onsubmit="return confirm('Batalkan pesanan ini? Stok akan dikembalikan.')">@csrf @method('PUT')
             <input type="hidden" name="status" value="dibatalkan">
             <button class="ad-btn red ad-full">@include('icon',['n'=>'trash']) Batalkan</button>
           </form>

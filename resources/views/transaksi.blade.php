@@ -67,4 +67,20 @@
     <a href="{{ route('home') }}#produk" class="gm-link">Mulai belanja &gt;</a>
   </div>
 @endforelse
+
+@if(session('pesanan_berhasil'))
+<div class="md-ov on" id="sukses" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="md-box sk-box">
+    <span class="sk-ico">@include('icon',['n'=>'check'])</span>
+    <h2>Pesanan berhasil dibuat!</h2>
+    <p>{{ session('pesanan_berhasil') }}</p>
+    <div class="sk-act">
+      <a href="{{ route('home') }}#produk" class="gm-btn out">Lanjut Belanja</a>
+      <button type="button" class="gm-btn or" onclick="document.getElementById('sukses').classList.remove('on')">Lihat Pesanan</button>
+    </div>
+  </div>
+</div>
+<script>document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('sukses')?.classList.remove('on')});</script>
+@endif
+
 @endsection
