@@ -9,7 +9,7 @@
 <body class="ad">
   <header class="ad-top">
     <button class="ad-burger" onclick="sb(true)">@include('icon',['n'=>'menu'])</button>
-    <a class="gm-brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/logo1.png') }}" width="45" alt="GoManisGo" class="gm-logo"><span>Go<b>Manis</b>Go</span></a>
+    <a class="gm-brand" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/Logo1.png') }}" width="45" alt="GoManisGo" class="gm-logo"><span>Go<b>Manis</b>Go</span></a>
     <div class="ad-user">
       <span>{{ auth('admin')->user()->nama_user }}<small>Admin</small></span>
       <div class="ad-ava">{{ strtoupper(substr(auth('admin')->user()->nama_user,0,1)) }}</div>

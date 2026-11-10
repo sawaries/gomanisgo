@@ -1,22 +1,26 @@
 {
   "version": 2,
-  "installCommand": "npm install",
+  "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "builds": [
-    {
-       "src": "api/index.php",
-       "use": "vercel-php@0.7.4"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.7.4",
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/(build|css|js|images)/(.*)",
-      "dest": "/public/$1/$2"
+      "src": "/(build|css|js|images|fonts|storage)/(.*)",
+      "dest": "/$1/$2"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/robots.txt"
     },
     {
       "src": "/(.*)",

@@ -44,20 +44,43 @@ class CheckoutController extends Controller
             }
         }
         $idUser = auth()->id();
-        DB::transaction(function () use ($items, $idUser) {
-            DB::statement('CALL buat_transaksi(?,?)', [$idUser, $items->first()->id_keranjang]);
-            $id = Transaksi::where('id_user', $idUser)->max('id_transaksi');
+        $totalHarga = $items->sum(fn ($i) => $i->jumlah * $i->produk->harga);
+
+        DB::transaction(function () use ($items, $idUser, $totalHarga) {
+            $transaksi = Transaksi::create([
+                'id_user' => $idUser,
+                'id_keranjang' => $items->first()->id_keranjang,
+                'sumber' => 'website',
+                'nomor_wa' => auth()->user()->no_telepon ?? null,
+                'total_harga' => $totalHarga,
+                'status' => 'diproses',
+            ]);
+
+            $id = $transaksi->id_transaksi;
+
             foreach ($items as $i) {
                 DetailTransaksi::create([
-                    'id_transaksi' => $id, 'id_produk' => $i->id_produk,
-                    'harga_satuan' => $i->produk->harga, 'jumlah' => $i->jumlah,
+                    'id_transaksi' => $id,
+                    'id_produk' => $i->id_produk,
+                    'nama_produk_snapshot' => $i->produk->nama_produk,
+                    'harga_satuan' => $i->produk->harga,
+                    'jumlah' => $i->jumlah,
                     'subtotal' => $i->jumlah * $i->produk->harga,
                 ]);
             }
-            Pembayaran::create(['id_transaksi' => $id, 'metode_pembayaran' => 'COD', 'total_bayar' => Transaksi::find($id)->total_harga]);
-            DetailKeranjang::where('id_keranjang', $items->first()->id_keranjang)->whereIn('id_produk', $items->pluck('id_produk'))->delete();
+
+            Pembayaran::create([
+                'id_transaksi' => $id,
+                'metode_pembayaran' => 'COD',
+                'total_bayar' => $totalHarga,
+                'status_pembayaran' => 'Belum Dibayar',
+            ]);
+
+            DetailKeranjang::where('id_keranjang', $items->first()->id_keranjang)
+                ->whereIn('id_produk', $items->pluck('id_produk'))
+                ->delete();
         });
 
-        return redirect()->route('transaksi.index')->with('success','Pesanan diterima! Tunggu status "Siap Diambil", lalu ambil dan bayar di toko.');
+        return redirect()->route('transaksi.index')->with('pesanan_berhasil','Pantau statusnya di halaman ini. Saat berstatus "Siap Diambil", ambil dan bayar di toko.');
     }
 }

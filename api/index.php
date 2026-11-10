@@ -1,4 +1,3 @@
-
 <?php
 
 // Arahkan seluruh storage Laravel ke direktori writable Vercel
@@ -6,17 +5,17 @@ $storagePath = '/tmp/storage';
 
 // Buat direktori yang diperlukan Laravel
 $dirs = [
-    $storagePath . '/app/private',
-    $storagePath . '/app/public',
-    $storagePath . '/framework/cache/data',
-    $storagePath . '/framework/sessions',
-    $storagePath . '/framework/views',
-    $storagePath . '/logs',
+    $storagePath.'/app/private',
+    $storagePath.'/app/public',
+    $storagePath.'/framework/cache/data',
+    $storagePath.'/framework/sessions',
+    $storagePath.'/framework/views',
+    $storagePath.'/logs',
     '/tmp/bootstrap/cache',
 ];
 
 foreach ($dirs as $dir) {
-    if (!is_dir($dir)) {
+    if (! is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
 }
@@ -24,7 +23,7 @@ foreach ($dirs as $dir) {
 // Laravel 13 mendukung LARAVEL_STORAGE_PATH
 $_ENV['LARAVEL_STORAGE_PATH'] = $storagePath;
 $_SERVER['LARAVEL_STORAGE_PATH'] = $storagePath;
-putenv('LARAVEL_STORAGE_PATH=' . $storagePath);
+putenv('LARAVEL_STORAGE_PATH='.$storagePath);
 
 // Arahkan cache Laravel ke direktori sementara
 $cacheFiles = [
@@ -42,7 +41,21 @@ foreach ($cacheFiles as $key => $value) {
 }
 
 // Lokasi compiled Blade
-putenv('VIEW_COMPILED_PATH=' . $storagePath . '/framework/views');
+putenv('VIEW_COMPILED_PATH='.$storagePath.'/framework/views');
+
+// Tangani SSL CA jika ada raw text atau file tidak valid
+$sslCa = $_ENV['MYSQL_ATTR_SSL_CA'] ?? $_SERVER['MYSQL_ATTR_SSL_CA'] ?? getenv('MYSQL_ATTR_SSL_CA');
+if (! empty($sslCa)) {
+    if (str_contains($sslCa, 'BEGIN CERTIFICATE')) {
+        file_put_contents('/tmp/ca.pem', $sslCa);
+        $_ENV['MYSQL_ATTR_SSL_CA'] = '/tmp/ca.pem';
+        $_SERVER['MYSQL_ATTR_SSL_CA'] = '/tmp/ca.pem';
+        putenv('MYSQL_ATTR_SSL_CA=/tmp/ca.pem');
+    } elseif (! file_exists($sslCa)) {
+        unset($_ENV['MYSQL_ATTR_SSL_CA'], $_SERVER['MYSQL_ATTR_SSL_CA']);
+        putenv('MYSQL_ATTR_SSL_CA');
+    }
+}
 
 // Jalankan Laravel
-require __DIR__ . '/../public/index.php';
+require __DIR__.'/../public/index.php';
