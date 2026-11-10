@@ -257,6 +257,310 @@ img{max-width:100%}
 .au-brand{text-align:center;margin-bottom:1rem;font-size:1.1rem;font-weight:700}
 .au-brand b{color:var(--color-oranye)}
 
+/* ===== GoManisGo: Modern Split Auth Layout (Mirip Mockup) ===== */
+.au-split-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.au-split-card {
+  width: 100%;
+  max-width: 920px;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 14px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.04);
+  display: grid;
+  grid-template-columns: 1.18fr 1fr;
+  align-items: stretch;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Panel Kiri: Gradien Coklat - Oranye Glowing Persis Mockup */
+.au-split-visual {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 480px;
+  background-color: #120401;
+}
+
+/* Layer 1: Gradasi warna tembaga-amber ke coklat pekat persis mockup */
+.au-split-visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 85% 12%, #f5740a 0%, #d45209 25%, #842807 52%, transparent 75%),
+    radial-gradient(circle at 25% 38%, #6d2206 0%, #360f02 50%, transparent 70%),
+    linear-gradient(165deg, rgba(234, 88, 12, 0.45) 0%, rgba(67, 20, 7, 0.85) 45%, #120401 80%);
+  z-index: 0;
+}
+
+/* Layer 2: Cahaya amber dinamis bergerak lembut (Breathing Copper Glow) */
+.au-split-visual::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle at 62% 28%, rgba(249, 115, 22, 0.65) 0%, rgba(194, 65, 12, 0.35) 38%, transparent 65%);
+  animation: au-copper-glow 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes au-copper-glow {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-32px, 24px) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-12px, 42px) scale(0.96);
+    opacity: 0.85;
+  }
+}
+
+/* Brand Header Kiri Atas: Kotak Logo Putih + Teks Putih di Luar (Persis Mockup) */
+.au-brand-wrap {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.au-brand-icon {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  flex-shrink: 0;
+}
+.au-brand-icon img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+.au-brand-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Teks Kiri Bawah (Persis Mockup) */
+.au-visual-text {
+  position: relative;
+  z-index: 2;
+}
+.au-visual-text h2 {
+  color: #ffffff;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+.au-visual-text p {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.74rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 290px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Panel Kanan: Form Kontainer */
+.au-split-form {
+  padding: 2.25rem 2.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.au-form-header {
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+.au-form-header h1 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.02em;
+}
+.au-form-header p {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.au-field {
+  margin-bottom: 0.9rem;
+}
+.au-field label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+.au-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.84rem;
+  color: #111827;
+  outline: 0;
+  transition: border-color .15s, box-shadow .15s;
+}
+.au-input:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+}
+
+.au-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 1.1rem;
+  font-size: 0.78rem;
+}
+.au-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4b5563;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+.au-forgot-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color .15s;
+}
+.au-forgot-link:hover {
+  color: #111827;
+  text-decoration: underline;
+}
+
+/* Tombol Hitam Modern */
+.au-submit-btn {
+  width: 100%;
+  background: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.72rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.au-submit-btn:hover {
+  background: #27272a;
+  transform: translateY(-1px);
+}
+.au-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Divider / Pemisah */
+.au-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.25rem 0;
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+.au-divider::before, .au-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+.au-divider span {
+  padding: 0 0.75rem;
+}
+
+/* Footer Links & Note */
+.au-footer-links {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.2rem;
+}
+.au-footer-links a {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+}
+.au-footer-links a:hover {
+  text-decoration: underline;
+}
+
+.au-legal-note {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #9ca3af;
+  line-height: 1.45;
+  margin: 1.25rem 0 0;
+}
+.au-legal-note a {
+  color: #6b7280;
+  text-decoration: underline;
+}
+
+/* Wrapper Khusus Halaman Admin Login */
+.au-admin-page {
+  min-height: 100vh;
+  background: #f4f5f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 768px) {
+  .au-split-card {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    padding: 12px;
+    border-radius: 22px;
+  }
+  .au-split-visual {
+    display: none;
+  }
+  .au-split-form {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
 /* Pengganti style inline di halaman admin */
 .ad-stat b.ok{color:#16a34a}
 .ad-stat i.ok{background:#dcfce7;color:#16a34a}
