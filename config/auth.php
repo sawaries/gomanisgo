@@ -1,7 +1,9 @@
 <?php
 
+
 use App\Models\Admin;
 use App\Models\User;
+use App\Models\Gudang;
 
 return [
 
@@ -13,6 +15,7 @@ return [
     'guards' => [
         'web' => ['driver' => 'session', 'provider' => 'users'],
         'admin' => ['driver' => 'session', 'provider' => 'admins'],
+        'gudang' => ['driver' => 'session', 'provider' => 'gudangs'],
     ],
 
     /*
@@ -24,6 +27,7 @@ return [
     'providers' => [
         'users' => ['driver' => 'eloquent', 'model' => User::class],
         'admins' => ['driver' => 'eloquent', 'model' => Admin::class],
+        'gudangs' => ['driver' => 'eloquent', 'model' => Gudang::class],
     ],
 
     'passwords' => [

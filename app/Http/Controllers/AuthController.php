@@ -19,7 +19,7 @@ class AuthController extends Controller
     {
         $r->validate(['email' => 'required|email', 'password' => 'required']);
         // akun admin tidak bisa login di sini (khusus /admin/login)
-        $cred = $r->only('email', 'password') + [fn ($q) => $q->where('role', '!=', 'admin')->orWhereNull('role')];
+        $cred = $r->only('email', 'password') + [fn ($q) => $q->whereNotIn('role', ['admin', 'gudang'])->orWhereNull('role')];
         if (Auth::attempt($cred)) {
             $r->session()->regenerate();
 

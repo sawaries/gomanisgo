@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('gudang.layout')
 @section('title','Pesanan Masuk')
 @section('content')
 @php

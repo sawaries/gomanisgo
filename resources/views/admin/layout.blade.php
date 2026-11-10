@@ -24,7 +24,7 @@
       <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'on' : '' }}">@include('icon',['n'=>'home']) Dashboard</a>
       <a href="{{ route('admin.produk.index') }}" class="{{ request()->routeIs('admin.produk.*') ? 'on' : '' }}">@include('icon',['n'=>'box']) Manajemen Produk</a>
       <a href="{{ route('admin.kategori.index') }}" class="{{ request()->routeIs('admin.kategori.*') ? 'on' : '' }}">@include('icon',['n'=>'folder']) Manajemen Kategori</a>
-      <a href="{{ route('admin.pesanan.index') }}" class="{{ request()->routeIs('admin.pesanan.*') ? 'on' : '' }}">@include('icon',['n'=>'bag']) Pesanan Masuk</a>
+      <a href="{{ route('gudang.dashboard') }}">@include('icon',['n'=>'bag']) Gudang</a>
       <a href="{{ route('admin.penjualan.index') }}" class="{{ request()->routeIs('admin.penjualan.*') ? 'on' : '' }}">@include('icon',['n'=>'trend']) Laporan Penjualan</a>
     </aside>
 

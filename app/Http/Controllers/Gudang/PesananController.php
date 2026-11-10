@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Gudang;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pembayaran;
@@ -39,7 +39,7 @@ class PesananController extends Controller
         $histori = Transaksi::with('user')->whereIn('status', ['selesai', 'dibatalkan'])
             ->where('tanggal_transaksi', '>=', now()->subDays(30))->latest('id_transaksi')->get();
 
-        return view('admin.Pesanan', compact('list', 'sel', 'st', 'stat', 'histori'));
+        return view('gudang.Pesanan', compact('list', 'sel', 'st', 'stat', 'histori'));
     }
 
     public function updateStatus(Request $r, $id)
