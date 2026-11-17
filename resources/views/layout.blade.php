@@ -88,6 +88,22 @@
 
   @auth
     @include('partials.chatbot')
+
+  <script>
+    (function(){
+      const sk=document.getElementById('kategori'), sp=document.getElementById('produk');
+      if(!sk&&!sp) return; // hanya aktif di beranda
+      const links=[...document.querySelectorAll('[data-spy]')];
+      const top=e=>e.getBoundingClientRect().top+window.scrollY;
+      const cek=()=>{
+        const y=window.scrollY+120; let k='home';
+        if(sk&&y>=top(sk)) k='kategori';
+        if(sp&&(y>=top(sp)||innerHeight+scrollY>=document.body.scrollHeight-2)) k='produk';
+        links.forEach(a=>a.classList.toggle('active',a.dataset.spy===k));
+      };
+      addEventListener('scroll',cek,{passive:true}); addEventListener('resize',cek); cek();
+    })();
+  </script>
   @endauth
 </body>
 </html>

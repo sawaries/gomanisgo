@@ -46,7 +46,7 @@
         <div class="kr-pay">BAYAR DI TOKO (COD)<small style="display:block;font-weight:400">Bayar tunai saat mengambil pesanan.</small></div>
 
         <form method="POST" action="{{ route('checkout.process') }}" style="margin-top:.8rem"
-            onsubmit="const b=this.querySelector('button');b.disabled=true;b.textContent='Memproses...'">
+              onsubmit="const b=this.querySelector('button');b.disabled=true;b.textContent='Memproses...'">
           @csrf
           @foreach($items as $it)<input type="hidden" name="ids[]" value="{{ $it->id_produk }}">@endforeach
           <button class="gm-btn or">Konfirmasi Pesanan</button>

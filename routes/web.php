@@ -5,8 +5,10 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\PenjualanController;
-use App\Http\Controllers\Admin\PesananController;
 use App\Http\Controllers\Admin\ProdukController;
+use App\Http\Controllers\Gudang\AuthController as GudangAuthController;
+use App\Http\Controllers\Gudang\DashboardController as GudangDashboardController;
+use App\Http\Controllers\Gudang\PesananController as GudangPesananController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckoutController;
@@ -69,7 +71,15 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::put('produk/{id}/status', [ProdukController::class, 'toggle'])->name('produk.toggle');
     Route::resource('produk', ProdukController::class)->except(['create', 'edit', 'show']);
     Route::resource('kategori', KategoriController::class)->except(['create', 'edit', 'show']);
-    Route::get('pesanan', [PesananController::class, 'index'])->name('pesanan.index');
-    Route::put('pesanan/{id}/status', [PesananController::class, 'updateStatus'])->name('pesanan.status');
     Route::put('kategori/{id}/status', [KategoriController::class, 'toggle'])->name('kategori.toggle');
+});
+
+Route::get('/gudang', [GudangAuthController::class, 'loginForm'])->name('gudang.login');
+Route::post('/gudang/login', [GudangAuthController::class, 'login'])->name('gudang.login.submit');
+Route::post('/gudang/logout', [GudangAuthController::class, 'logout'])->name('gudang.logout');
+
+Route::prefix('gudang')->name('gudang.')->middleware('gudang')->group(function () {
+    Route::get('dashboard', [GudangDashboardController::class, 'index'])->name('dashboard');
+    Route::get('pesanan', [GudangPesananController::class, 'index'])->name('pesanan.index');
+    Route::put('pesanan/{id}/status', [GudangPesananController::class, 'updateStatus'])->name('pesanan.status');
 });

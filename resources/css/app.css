@@ -561,6 +561,7 @@ img{max-width:100%}
   }
 }
 
+
 /* Pengganti style inline di halaman admin */
 .ad-stat b.ok{color:#16a34a}
 .ad-stat i.ok{background:#dcfce7;color:#16a34a}
@@ -722,6 +723,7 @@ img{max-width:100%}
 .gm-logo{width:34px;height:34px;border-radius:8px;object-fit:contain}
 .ad-drop.ok{border-color:#22c55e;background:#f0fdf4;color:#15803d}
 .ad-ok{font-size:.72rem;font-weight:600;color:#15803d}
+a.ad-out{display:inline-block;text-decoration:none}
 
 /* ===== GoManisGo: scroll navbar, tombol proses, pop-up sukses ===== */
 html{scroll-padding-top:5rem}
