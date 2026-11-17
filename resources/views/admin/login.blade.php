@@ -12,9 +12,11 @@
 
     {{-- Kiri: Animated Brown/Amber Glowing Gradient --}}
     <div class="au-split-visual">
-      <div class="au-brand-pill">
-        <img src="{{ asset('images/Logo1.png') }}" alt="GoManisGo">
-        <span>GoManisGo</span>
+      <div class="au-brand-wrap">
+        <div class="au-brand-icon">
+          <img src="{{ asset('images/Logo1.png') }}" alt="GoManisGo">
+        </div>
+        <span class="au-brand-text">GoManisGo</span>
       </div>
 
       <div class="au-visual-text">
